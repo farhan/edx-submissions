@@ -37,9 +37,7 @@ jobs:
         mysql -V
 
     - name: Install Python dependencies
-      run: |
-        uv sync --locked --group test
-        uv pip install mysqlclient --no-binary mysqlclient
+      run: uv sync --locked --group test
 
     - name: Initiate Services
       run: |
@@ -63,7 +61,7 @@ jobs:
       run: |
         echo "CREATE DATABASE IF NOT EXISTS submissions_db;" | sudo mysql -u root
         echo "Testing migrations."
-        if uv run python ./manage.py makemigrations --dry-run | grep -q 'No changes detected'; then
+        if uv run --with mysqlclient --no-binary-package mysqlclient python ./manage.py makemigrations --dry-run | grep -q 'No changes detected'; then
           echo "Migrations up to date."
         else
           echo "ERROR: Missing migration files for model changes. Run ./manage.py makemigrations"
